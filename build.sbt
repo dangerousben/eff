@@ -3,6 +3,8 @@ import org.scalajs.sbtplugin.cross.CrossType
 import org.scalajs.jsenv.nodejs._
 
 lazy val catsVersion        = "1.1.0"
+lazy val catsMtlVersion     = "0.3.0"
+lazy val disciplineVersion  = "0.9.0"
 lazy val monixVersion       = "3.0.0-RC1"
 lazy val scalazVersion      = "7.2.22"
 lazy val specs2Version      = "4.2.0"
@@ -21,8 +23,8 @@ lazy val eff = project.in(file("."))
   .settings(effSettings)
   .settings(noPublishSettings)
   .settings(commonJvmSettings ++ Seq(libraryDependencies ++= scalameter):_*)
-  .aggregate(coreJVM, coreJS, doobie, cats, macros, monixJVM, monixJS, scalaz, twitter)
-  .dependsOn(coreJVM % "test->test;compile->compile", coreJS, doobie, cats, macros, monixJVM, monixJS, scalaz, twitter)
+  .aggregate(coreJVM, coreJS, doobie, cats, catsMtl, macros, monixJVM, monixJS, scalaz, twitter)
+  .dependsOn(coreJVM % "test->test;compile->compile", coreJS, doobie, cats, catsMtl, macros, monixJVM, monixJS, scalaz, twitter)
 
 lazy val core = crossProject.crossType(CrossType.Full).in(file("."))
   .settings(moduleName := "eff")
@@ -44,6 +46,12 @@ lazy val cats = project.in(file("cats"))
   .settings(moduleName := "eff-cats-effect")
   .dependsOn(coreJVM)
   .settings(libraryDependencies ++= catsEffectJvm)
+  .settings(effSettings ++ commonJvmSettings:_*)
+
+lazy val catsMtl = project.in(file("cats-mtl"))
+  .settings(moduleName := "eff-cats-mtl")
+  .dependsOn(coreJVM)
+  .settings(libraryDependencies ++= catsMtlJvm ++ disciplineJvm)
   .settings(effSettings ++ commonJvmSettings:_*)
 
 lazy val macros = project.in(file("macros"))
@@ -222,6 +230,13 @@ lazy val catsJvm = Seq(
 
 lazy val catsJs = Seq(
   "org.typelevel" %%%! "cats-core" % catsVersion)
+
+lazy val catsMtlJvm = Seq(
+  "org.typelevel" %% "cats-mtl-core" % catsMtlVersion,
+  "org.typelevel" %% "cats-mtl-laws" % catsMtlVersion % "test")
+
+lazy val disciplineJvm = Seq(
+   "org.typelevel" %% "discipline" % disciplineVersion % "test")
 
 lazy val doobieJvm = Seq(
   "org.tpolecat" %% "doobie-core" % doobieVersion,
